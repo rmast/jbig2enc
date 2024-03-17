@@ -55,6 +55,8 @@ usage(const char *argv0) {
   fprintf(stderr, "  -O <outfile>: dump thresholded image as PNG\n");
   fprintf(stderr, "  -2: upsample 2x before thresholding\n");
   fprintf(stderr, "  -4: upsample 4x before thresholding\n");
+  fprintf(stderr, "  -8: upsample 8x before thresholding\n");
+  fprintf(stderr, "  -16: upsample 16x before thresholding\n");
   fprintf(stderr, "  -S: remove images from mixed input and save separately\n");
   fprintf(stderr, "  -j --jpeg-output: write images from mixed input as JPEG\n");
   fprintf(stderr, "  -a --auto-thresh: use automatic thresholding in symbol encoder\n");
@@ -214,6 +216,7 @@ main(int argc, char **argv) {
   bool symbol_mode = false;
   bool refine = false;
   bool up2 = false, up4 = false;
+  bool up8 = false, up16 = false;
   const char *output_threshold = NULL;
   const char *basename = "output";
   l_int32 img_fmt = IFF_PNG;
@@ -284,6 +287,14 @@ main(int argc, char **argv) {
     }
     if (strcmp(argv[i], "-4") == 0) {
       up4 = true;
+      continue;
+    }
+    if (strcmp(argv[i], "-8") == 0) {
+      up8 = true;
+      continue;
+    }
+    if (strcmp(argv[i], "-16") == 0) {
+      up16 = true;
       continue;
     }
 
@@ -431,6 +442,12 @@ main(int argc, char **argv) {
         pixt = pixScaleGray2xLIThresh(gray, bw_threshold);
       } else if (up4) {
         pixt = pixScaleGray4xLIThresh(gray, bw_threshold);
+      } else if (up8) {
+	pixt = pixScaleGray2xLI(gray);	
+        pixt = pixScaleGray4xLIThresh(pixt, bw_threshold);
+      } else if (up16) {
+	pixt = pixScaleGray4xLI(gray);	
+        pixt = pixScaleGray4xLIThresh(pixt, bw_threshold);
       } else {
         pixt = pixThresholdToBinary(gray, bw_threshold);
       }
